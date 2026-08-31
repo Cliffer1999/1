@@ -56,21 +56,24 @@ Each round follows:
 Free Phase → Predation Phase(s) → Evolution Phase
 ```
 
+A player may initially pass during a Predation stage and still decide to attack later. If the player is still marked as passing when the stage ends **and was not targeted by another player during that stage**, the game automatically deducts that stage's predation value from their life.
+
 ### Australian-localised skill deck
 
 The 17 supplied skills are implemented with localised names, including **Wedge-tail Vision**, **Three-Headed Dingo**, **Dingo Pack Leader**, **Echidna Spines**, **Inland Taipan Venom**, **Bushland Sceptre**, **Tail Drop** and **Torpor**.
 
 ## Implemented game systems
 
-- Secret random identity assignment for 10 players
+- Secret random identity assignment for exactly 10 players
 - Public life, skill, card-count and status board
 - Private identity reveal workflow
-- Cyclic K/Q/J and faction combat resolution
+- Cyclic K/Q/J and habitat combat resolution
 - Platypus Joker special rule
 - Predation cards 1–10 and card consumption
 - Free-phase life and predation-card trading
 - 10-life received-trade cap per round
 - Round-based predation values (2 / 3 / 4+5 / 6+7)
+- Pass / reconsider / automatic refusal-penalty workflow
 - Nature Reserve protection in Rounds 1–2
 - Two predation stages in Rounds 3–4
 - Evolution skill auctions using life bids
@@ -95,13 +98,24 @@ The 17 supplied skills are implemented with localised names, including **Wedge-t
 
 ## Testing
 
-The game engine is separated from the browser UI and tested with Node's built-in test runner.
+The rules engine is separated from the browser UI and tested with Node's built-in test runner.
 
 ```bash
 npm test
 ```
 
-The test suite covers core match-ups, Joker behaviour, Amphibious override, predation values, card consumption, Blood Rush, Apex Bloodline, Evasive Leap, Decoy, Three-Headed Dingo, Echidna Spines, Tail Drop, Torpor, Parasite, Genetic Adaptation, Habitat Collapse, Inland Taipan Venom, Scavenger, trading rules, Wedge-tail Vision, round skill pools, Dingo Pack Leader follow-ups, Nature Reserve behaviour and elimination rewards.
+For the full CI-equivalent check:
+
+```bash
+npm install
+npx playwright install chromium
+npm run check
+npm run test:e2e
+```
+
+Current automated coverage includes **35 engine tests** plus real Chromium end-to-end flows. The browser suite verifies that a 10-player game can start, a private role can be revealed, predation resolves through the UI, pass penalties are applied, the full 17-skill rules deck is visible, and the state machine can progress through all four rounds to Final Standings without page errors.
+
+GitHub Actions runs both the engine tests and Chromium browser gameplay tests on every push to `main` and on pull requests.
 
 ## Technical notes
 
@@ -110,11 +124,12 @@ The test suite covers core match-ups, Joker behaviour, Amphibious override, pred
 - No runtime dependencies
 - `localStorage` autosave
 - Node `node:test` unit tests
+- Playwright Chromium end-to-end tests
 - GitHub Actions CI
 
 ## Portfolio angle
 
-This project demonstrates translating a detailed rule specification into a working state machine, handling edge cases and conflicting skill interactions, building a pass-and-play UI, writing automated tests, and shipping the result as a dependency-free web application.
+This project demonstrates translating a detailed rule specification into a working state machine, handling edge cases and conflicting skill interactions, building a pass-and-play UI, writing automated unit and browser tests, and shipping the result as a dependency-free web application.
 
 ## Licence
 
