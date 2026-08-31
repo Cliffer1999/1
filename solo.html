@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f3425" />
+  <meta name="description" content="Wild Australia: Evolution Clash — solo mode against nine AI-controlled opponents." />
+  <title>Solo vs AI · Wild Australia: Evolution Clash</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">SOLO MODE · 1 HUMAN + 9 AI</p>
+      <h1>Wild Australia: Evolution Clash</h1>
+      <p class="subtitle">Play the full four-round social strategy game by yourself. The AI handles nine rival players, table talk, predation and auctions.</p>
+    </div>
+    <div class="header-actions">
+      <a class="ghost link-button" href="index.html">Modes</a>
+      <button id="rulesBtn" class="ghost">Rules</button>
+      <button id="resetBtn" class="danger ghost hidden">New Solo Game</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section id="soloSetup" class="panel setup-panel solo-hero">
+      <div class="setup-copy">
+        <span class="pill">Quick playable portfolio demo</span>
+        <h2>Enter the ecosystem</h2>
+        <p>You control one hidden identity. Nine AI opponents negotiate, bluff, prey, pass and bid around you.</p>
+        <div class="rule-strip">
+          <span>🤖 9 AI rivals</span>
+          <span>💬 Simulated table talk</span>
+          <span>🎯 You choose your predation</span>
+          <span>🧬 AI skill auctions</span>
+        </div>
+      </div>
+      <form id="soloSetupForm" class="solo-start-form">
+        <label class="name-field solo-name"><span>YOUR NAME</span><input id="soloName" value="Player" maxlength="24" required></label>
+        <button class="primary jumbo" type="submit">Start Solo Game</button>
+      </form>
+      <p class="small-note">Solo mode runs entirely in your browser and saves automatically on this device.</p>
+    </section>
+
+    <section id="soloGame" class="hidden">
+      <section class="status-board panel">
+        <div><span class="label">Round</span><strong id="roundText">1 / 4</strong></div>
+        <div><span class="label">Phase</span><strong id="phaseText">Free</strong></div>
+        <div><span class="label">Predation stake</span><strong id="stakeText">2 life</strong></div>
+        <div><span class="label">Living</span><strong id="livingText">10</strong></div>
+        <div class="status-actions"><span class="pill solo-pill">SOLO AI</span></div>
+      </section>
+
+      <section class="solo-layout">
+        <div class="main-column">
+          <section class="panel your-survivor-panel">
+            <div class="section-heading">
+              <div><p class="eyebrow">YOUR SURVIVOR</p><h2 id="yourName">Player</h2></div>
+              <button id="revealSoloRoleBtn" class="ghost">Reveal my identity</button>
+            </div>
+            <div class="solo-you-stats">
+              <div><span class="label">Life</span><strong id="yourLife">20</strong></div>
+              <div><span class="label">Cards left</span><strong id="yourCards">10</strong></div>
+              <div><span class="label">Skills</span><strong id="yourSkillCount">0</strong></div>
+            </div>
+            <div id="yourSkills" class="skills-mini solo-skills"></div>
+          </section>
+
+          <section class="panel">
+            <div class="section-heading"><div><p class="eyebrow">PUBLIC TABLE</p><h2>Players</h2></div><p class="muted">AI identities stay hidden. Public life, cards and skills remain visible.</p></div>
+            <div id="soloPlayerGrid" class="player-grid"></div>
+          </section>
+
+          <section class="panel control-panel">
+            <div class="section-heading"><div><p class="eyebrow">YOUR TURN</p><h2 id="soloControlTitle">Discussion Phase</h2></div><span id="roundBadge" class="pill">Round 1</span></div>
+            <div id="soloControls"></div>
+          </section>
+        </div>
+
+        <aside class="side-column solo-side">
+          <section class="panel discussion-panel">
+            <div class="section-heading compact"><div><p class="eyebrow">DISCUSSION</p><h3>Table talk</h3></div><button id="botTalkBtn" class="text-button">More AI talk</button></div>
+            <div id="discussionLog" class="discussion-log"></div>
+            <form id="discussionForm" class="discussion-compose"><input id="discussionInput" maxlength="220" placeholder="Bluff, negotiate or call someone out…"><button class="primary" type="submit">Send</button></form>
+          </section>
+          <section class="panel quick-rules"><p class="eyebrow">MATCH-UP</p><h3>Predation cycle</h3><div class="cycle">K <span>›</span> Q <span>›</span> J <span>›</span> K</div><p>Same rank: <strong>Outback › Reef › Bushland › Outback</strong>.</p><p class="muted">Platypus Joker wins as predator and loses as prey.</p></section>
+          <section class="panel"><div class="section-heading compact"><div><p class="eyebrow">EVENT LOG</p><h3>Latest</h3></div></div><ol id="soloEventLog" class="event-log"></ol></section>
+        </aside>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="soloRoleDialog" class="modal"><div class="modal-card secret-card"><button class="close-dialog" data-close="soloRoleDialog">×</button><p class="eyebrow">YOUR SECRET IDENTITY</p><div id="soloRoleIcon" class="role-icon">🦘</div><h2 id="soloRoleName">Outback K</h2><p id="soloRoleRule" class="muted"></p><button class="primary" data-close="soloRoleDialog">Hide identity</button></div></dialog>
+  <dialog id="rulesDialog" class="modal rules-modal"><div class="modal-card wide"><button class="close-dialog" data-close="rulesDialog">×</button><p class="eyebrow">HOW TO PLAY</p><h2>Solo mode rules</h2><div id="rulesContent"></div></div></dialog>
+  <dialog id="messageDialog" class="modal"><div class="modal-card"><button class="close-dialog" data-close="messageDialog">×</button><p id="messageKicker" class="eyebrow">RESULT</p><h2 id="messageTitle">Done</h2><div id="messageBody"></div><button class="primary" data-close="messageDialog">Continue</button></div></dialog>
+
+  <script type="module" src="solo.js"></script>
+</body>
+</html>
