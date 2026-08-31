@@ -1,45 +1,74 @@
 # 🇦🇺 Wild Australia: Evolution Clash
 
-A browser-based, 10-player pass-and-play social strategy game adapted for an Australian audience.
+A browser-based Australian social strategy game with **Solo vs AI**, **Online Multiplayer foundation**, and **Local Pass & Play** modes.
 
-🎮 **[Play the live game](https://cliffer1999.github.io/1/)**
+🎮 **[Open the live game](https://cliffer1999.github.io/1/)**
+
+- 🤖 **[Solo vs AI](https://cliffer1999.github.io/1/solo.html)** — playable now: 1 human + 9 AI
+- 📱 **[Local Pass & Play](https://cliffer1999.github.io/1/local.html)** — playable now: 10 people sharing one device
+- 🌐 **[Online Multiplayer](https://cliffer1999.github.io/1/online.html)** — room/chat client and Supabase schema implemented; live backend connection still required before real rooms can be used
 
 ## Screenshots
 
-### Predation dashboard
-![Wild Australia predation dashboard](docs/screenshots/02-predation-dashboard.png)
+### Game mode selection
+![Wild Australia game mode selection](docs/screenshots/01-mode-select.png)
+
+### Solo vs AI
+![Wild Australia Solo vs AI dashboard](docs/screenshots/02-solo-dashboard.png)
 
 <details>
 <summary>More screenshots</summary>
 
-### Game setup
-![Wild Australia game setup](docs/screenshots/01-landing.png)
+### Local predation dashboard
+![Wild Australia local predation dashboard](docs/screenshots/03-local-predation.png)
 
 ### Rules & Australian skill deck
-![Wild Australia rules and skills](docs/screenshots/03-rules-and-skills.png)
+![Wild Australia rules and skills](docs/screenshots/04-rules-and-skills.png)
 
 </details>
 
-The project takes the supplied **Forest Evolution / Forest Battle** ruleset as its mechanical base and localises the presentation around three Australian habitats: **Outback**, **Great Barrier Reef** and **Bushland**. Core mechanics such as secret identities, life points, numbered predation cards, cyclic match-ups, four rounds, Free / Predation / Evolution phases and the supplied skill effects are retained.
+The project takes the supplied **Forest Evolution / Forest Battle** ruleset as its mechanical base and localises the presentation around three Australian habitats: **Outback**, **Great Barrier Reef** and **Bushland**. Core mechanics such as secret identities, life points, numbered predation cards, cyclic match-ups, four rounds, discussion/free phases, predation, evolution auctions and the supplied skill effects are retained.
 
 > This repository is an independent game prototype. It is not affiliated with the original television programme, production company or rights holders. The Australian names, interface and artwork treatment in this repository are original to this adaptation.
 
-## Play
+## Game modes
 
-The fastest way to try it is the **live GitHub Pages build** above. No account or installation is required.
+### 🤖 Solo vs AI — playable
 
-For local play:
+Solo mode is designed so one person can experience the game without assembling a 10-player group.
 
-1. Download or clone the repository.
-2. Serve the folder with any static web server.
-3. Enter exactly 10 player names.
-4. Pass the device around for private identity checks, then use the public game dashboard as the referee / game state tracker.
+- You control Seat 1 and receive one private hidden identity.
+- Nine AI-controlled rivals occupy the other seats.
+- AI players generate table-talk during the discussion/free phase without revealing their hidden identities.
+- You can bluff in chat, negotiate life and card trades, and use free-phase abilities.
+- You choose your own predation targets; AI players choose legal targets, attack or pass using the same core rules engine.
+- Evolution skills are auctioned using life. You set your maximum bid while AI opponents submit competing bids.
+- The complete state machine runs through all four rounds to Final Standings.
+- Solo progress autosaves locally in the browser.
 
-```bash
-python3 -m http.server 8080
-```
+The AI is intentionally lightweight and deterministic-rule-driven rather than presented as human-level strategic intelligence. Its purpose is to make the complete design immediately playable and testable by one person.
 
-Then open `http://localhost:8080`.
+### 🌐 Online Multiplayer — backend connection pending
+
+The online client is structured for **10 players on separate devices** with the discussion phase preserved as real room chat.
+
+Implemented in the repository:
+
+- six-character room-code UI
+- create/join room client
+- 10-seat lobby
+- anonymous player-session flow
+- realtime room-player and chat subscriptions
+- room discussion chat
+- host start control when all 10 seats are occupied
+- private-secret data model with Row Level Security design
+- Supabase SQL schema for `rooms`, `room_players`, `player_secrets` and `messages`
+
+The published site currently keeps Create/Join disabled when Supabase credentials are not configured. **Authoritative online role assignment and synchronized predation/evolution actions are not yet claimed as complete.** This avoids presenting a local simulation as working multiplayer.
+
+### 📱 Local Pass & Play — playable
+
+The original tested digital-tabletop mode remains available. Exactly 10 people share one phone, tablet or computer, pass the device around for private identity checks, discuss face-to-face, and use the public dashboard as the game referee/state tracker.
 
 ## Australian edition
 
@@ -50,7 +79,7 @@ Then open `http://localhost:8080`.
 - 🌿 Bushland K / Q / J
 - 🦆 Platypus Joker
 
-Match-ups preserve the original cyclic structure:
+Match-ups preserve the cyclic structure:
 
 ```text
 K > Q > J > K
@@ -71,20 +100,19 @@ Platypus Joker wins whenever it is the predator and loses whenever it is the pre
 Each round follows:
 
 ```text
-Free Phase → Predation Phase(s) → Evolution Phase
+Discussion / Free Phase → Predation Phase(s) → Evolution Phase
 ```
 
-A player may initially pass during a Predation stage and still decide to attack later. If the player is still marked as passing when the stage ends **and was not targeted by another player during that stage**, the game automatically deducts that stage's predation value from their life.
+A player may initially pass during a Predation stage and still decide to attack later. If the player is still marked as passing when the stage ends **and was not targeted by another player during that stage**, the game deducts that stage's predation value from their life.
 
 ### Australian-localised skill deck
 
 The 17 supplied skills are implemented with localised names, including **Wedge-tail Vision**, **Three-Headed Dingo**, **Dingo Pack Leader**, **Echidna Spines**, **Inland Taipan Venom**, **Bushland Sceptre**, **Tail Drop** and **Torpor**.
 
-## Implemented game systems
+## Implemented core systems
 
-- Secret random identity assignment for exactly 10 players
+- Secret random identity assignment for exactly 10 seats
 - Public life, skill, card-count and status board
-- Private identity reveal workflow
 - Cyclic K/Q/J and habitat combat resolution
 - Platypus Joker special rule
 - Predation cards 1–10 and card consumption
@@ -95,61 +123,45 @@ The 17 supplied skills are implemented with localised names, including **Wedge-t
 - Nature Reserve protection in Rounds 1–2
 - Two predation stages in Rounds 3–4
 - Evolution skill auctions using life bids
-- Genetic Adaptation auction discount
-- Wedge-tail Vision private reveal
-- Parasite host selection and copied predation gains
-- Evasive Leap redirect
-- Habitat Collapse faction damage
-- Three-Headed Dingo multi-attack allowance
-- Decoy interception
-- Dingo Pack Leader + two packmate follow-up attacks
-- Echidna Spines entry damage
-- Inland Taipan Venom mutual elimination
-- Bushland Sceptre / first-seat control
-- Tail Drop card sacrifice
-- Apex Bloodline no-card predation
-- Torpor target protection
-- Scavenger elimination gains
-- Elimination bonus (+3 life + eliminated player's remaining predation cards)
-- Browser local autosave + JSON save export
-- Responsive desktop / tablet / mobile UI
+- all 17 supplied skill effects
+- elimination bonus (+3 life + eliminated player's remaining predation cards)
+- responsive desktop / tablet / mobile UI
 
 ## Testing
 
-The rules engine is separated from the browser UI and tested with Node's built-in test runner.
-
-```bash
-npm test
-```
-
-For the full CI-equivalent check:
+The game rules are separated from the browser interfaces and run through automated CI.
 
 ```bash
 npm install
-npx playwright install chromium
 npm run check
+npx playwright install chromium
 npm run test:e2e
 ```
 
-Current automated coverage includes **35 engine tests** plus real Chromium end-to-end flows. The browser suite verifies that a 10-player game can start, a private role can be revealed, predation resolves through the UI, pass penalties are applied, the full 17-skill rules deck is visible, and the state machine can progress through all four rounds to Final Standings without page errors.
+Current verified CI coverage:
 
-GitHub Actions runs both the engine tests and Chromium browser gameplay tests on every push to `main` and on pull requests.
+- **41 Node tests passed** — 35 core engine tests + 6 Solo AI tests
+- **7 Chromium browser tests passed**
+- browser coverage includes the Mode Select page, Local gameplay, pass penalties, the complete four-round Local state machine, the 17-skill rules view, Solo discussion, the complete four-round Solo state machine, and the safe Online-backend-not-configured state
+- automated real-browser portfolio screenshot generation also passes
+
+GitHub Actions runs syntax, engine/AI tests and Chromium browser gameplay tests on pushes. GitHub Pages automatically deploys the multi-mode static site.
 
 ## Technical notes
 
 - Vanilla HTML / CSS / JavaScript
-- ES modules
-- No runtime dependencies
-- `localStorage` autosave
-- Node `node:test` unit tests
+- Shared ES-module rules engine
+- Rule-driven Solo AI layer
+- `localStorage` Solo/Local autosave
+- Node `node:test`
 - Playwright Chromium end-to-end tests
 - GitHub Actions CI
 - GitHub Pages automated deployment
-- Automated real-browser portfolio screenshot generation
+- Supabase Realtime client + SQL/RLS multiplayer foundation
 
 ## Portfolio angle
 
-This project demonstrates translating a detailed rule specification into a working state machine, handling edge cases and conflicting skill interactions, building a pass-and-play UI, writing automated unit and browser tests, and shipping the result as a dependency-free web application.
+This project demonstrates translating a detailed social-game rules specification into a working state machine, preserving a negotiation/discussion phase across different play modes, handling edge cases and interacting abilities, adding a playable AI simulation, designing a realtime multiplayer data model, writing automated unit/browser tests, and shipping the result as a browser application.
 
 ## Licence
 
