@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f3425" />
+  <meta name="description" content="Wild Australia: Evolution Clash — a 10-player pass-and-play social strategy game adapted for an Australian theme." />
+  <title>Wild Australia: Evolution Clash</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">AUSTRALIAN EDITION · PASS & PLAY</p>
+      <h1>Wild Australia: Evolution Clash</h1>
+      <p class="subtitle">Bluff, trade, evolve and prey across the Outback, Reef and Bushland.</p>
+    </div>
+    <div class="header-actions">
+      <button id="rulesBtn" class="ghost">Rules</button>
+      <button id="saveBtn" class="ghost hidden">Export Save</button>
+      <button id="resetBtn" class="danger ghost hidden">New Game</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section id="setupView" class="panel setup-panel">
+      <div class="setup-copy">
+        <span class="pill">10 players</span>
+        <h2>Gather your crew</h2>
+        <p>Enter player names, then pass the device around so each player can privately check their identity.</p>
+        <div class="rule-strip">
+          <span>❤️ Start with 20 life</span>
+          <span>🎴 Cards 1–10</span>
+          <span>🧬 4 rounds</span>
+          <span>🏆 Most life wins</span>
+        </div>
+      </div>
+      <form id="setupForm">
+        <div id="nameGrid" class="name-grid"></div>
+        <button class="primary jumbo" type="submit">Start the Game</button>
+      </form>
+      <p class="small-note">No accounts, server or tracking. Game state stays in this browser unless you export it.</p>
+    </section>
+
+    <section id="gameView" class="hidden">
+      <section class="status-board panel">
+        <div><span class="label">Round</span><strong id="roundText">1 / 4</strong></div>
+        <div><span class="label">Phase</span><strong id="phaseText">Free</strong></div>
+        <div><span class="label">Predation stake</span><strong id="stakeText">2 life</strong></div>
+        <div><span class="label">Living</span><strong id="livingText">10</strong></div>
+        <div class="status-actions">
+          <button id="advanceBtn" class="primary">Advance Phase</button>
+        </div>
+      </section>
+
+      <section class="layout">
+        <div class="main-column">
+          <section class="panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">PUBLIC TABLE</p>
+                <h2>Players</h2>
+              </div>
+              <p class="muted">Life, skills and status are public. Identities remain secret.</p>
+            </div>
+            <div id="playerGrid" class="player-grid"></div>
+          </section>
+
+          <section class="panel control-panel">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">GAME CONTROL</p>
+                <h2 id="controlTitle">Free Phase</h2>
+              </div>
+              <span id="roundBadge" class="pill">Round 1</span>
+            </div>
+            <div id="phaseControls"></div>
+          </section>
+        </div>
+
+        <aside class="side-column">
+          <section class="panel quick-rules">
+            <p class="eyebrow">MATCH-UP</p>
+            <h3>Predation cycle</h3>
+            <div class="cycle">K <span>›</span> Q <span>›</span> J <span>›</span> K</div>
+            <p>Same rank: <strong>Outback › Reef › Bushland › Outback</strong>.</p>
+            <p class="muted">Platypus Joker always wins when attacking and always loses when targeted.</p>
+          </section>
+          <section class="panel">
+            <div class="section-heading compact">
+              <div><p class="eyebrow">EVENT LOG</p><h3>Latest</h3></div>
+              <button id="clearLogBtn" class="text-button">Clear view</button>
+            </div>
+            <ol id="eventLog" class="event-log"></ol>
+          </section>
+        </aside>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="roleDialog" class="modal">
+    <div class="modal-card secret-card">
+      <button class="close-dialog" data-close="roleDialog">×</button>
+      <p class="eyebrow">PRIVATE VIEW</p>
+      <h2 id="roleOwner">Player</h2>
+      <div id="roleRevealGate">
+        <p>Make sure only this player can see the screen.</p>
+        <button id="revealRoleBtn" class="primary">Reveal Identity</button>
+      </div>
+      <div id="roleReveal" class="hidden">
+        <div id="roleIcon" class="role-icon">🦘</div>
+        <h3 id="roleName">Outback K</h3>
+        <p id="roleRule" class="muted"></p>
+        <button class="primary" data-close="roleDialog">Hide & Pass On</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="hawkDialog" class="modal">
+    <div class="modal-card secret-card">
+      <button class="close-dialog" data-close="hawkDialog">×</button>
+      <p class="eyebrow">WEDGE-TAIL VISION · SECRET</p>
+      <h2 id="hawkTargetName">Target</h2>
+      <div id="hawkRevealGate">
+        <p>Only the skill owner should look at the screen.</p>
+        <button id="hawkRevealBtn" class="primary">Reveal Target Identity</button>
+      </div>
+      <div id="hawkReveal" class="hidden">
+        <div id="hawkRoleIcon" class="role-icon">🦅</div>
+        <h3 id="hawkRoleName"></h3>
+        <button class="primary" data-close="hawkDialog">Hide</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="rulesDialog" class="modal rules-modal">
+    <div class="modal-card wide">
+      <button class="close-dialog" data-close="rulesDialog">×</button>
+      <p class="eyebrow">HOW TO PLAY</p>
+      <h2>Wild Australia rules</h2>
+      <div id="rulesContent"></div>
+    </div>
+  </dialog>
+
+  <dialog id="messageDialog" class="modal">
+    <div class="modal-card">
+      <button class="close-dialog" data-close="messageDialog">×</button>
+      <p id="messageKicker" class="eyebrow">RESULT</p>
+      <h2 id="messageTitle">Done</h2>
+      <div id="messageBody"></div>
+      <button class="primary" data-close="messageDialog">Continue</button>
+    </div>
+  </dialog>
+
+  <input id="importInput" class="hidden" type="file" accept="application/json" />
+  <script type="module" src="app.js"></script>
+</body>
+</html>
