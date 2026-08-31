@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - index.html
+      - solo.html
+      - solo.js
+      - solo-ai.js
+      - local.html
       - styles.css
       - app-v2.js
       - engine.js
@@ -44,19 +48,24 @@ jobs:
 
           const browser = await chromium.launch({ headless: true });
           const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+
           await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+          await page.screenshot({ path: 'docs/screenshots/01-mode-select.png' });
 
-          await page.screenshot({ path: 'docs/screenshots/01-landing.png' });
+          await page.goto('http://127.0.0.1:4173/solo.html', { waitUntil: 'networkidle' });
+          await page.locator('#soloSetupForm button[type="submit"]').click();
+          await page.locator('#soloGame').waitFor({ state: 'visible' });
+          await page.screenshot({ path: 'docs/screenshots/02-solo-dashboard.png' });
 
+          await page.goto('http://127.0.0.1:4173/local.html', { waitUntil: 'networkidle' });
           await page.locator('#setupForm button[type="submit"]').click();
           await page.locator('#gameView').waitFor({ state: 'visible' });
           await page.locator('#advanceBtn').click();
-          await page.locator('#phaseText').waitFor();
-          await page.screenshot({ path: 'docs/screenshots/02-predation-dashboard.png' });
+          await page.screenshot({ path: 'docs/screenshots/03-local-predation.png' });
 
           await page.locator('#rulesBtn').click();
           await page.locator('#rulesDialog').waitFor({ state: 'visible' });
-          await page.screenshot({ path: 'docs/screenshots/03-rules-and-skills.png' });
+          await page.screenshot({ path: 'docs/screenshots/04-rules-and-skills.png' });
 
           await browser.close();
           NODE
@@ -69,6 +78,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Screenshots unchanged"
           else
-            git commit -m "Add real game portfolio screenshots"
+            git commit -m "Refresh multi-mode portfolio screenshots"
             git push
           fi
