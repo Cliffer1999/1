@@ -1,0 +1,74 @@
+name: Capture portfolio screenshots
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - styles.css
+      - app-v2.js
+      - engine.js
+      - .github/workflows/screenshots.yml
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install test tooling
+        run: npm install --no-audit --no-fund
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Start local game server
+        run: |
+          python3 -m http.server 4173 > /tmp/wild-australia-server.log 2>&1 &
+          sleep 2
+
+      - name: Capture real game screenshots
+        run: |
+          mkdir -p docs/screenshots
+          node --input-type=module <<'NODE'
+          import { chromium } from '@playwright/test';
+
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+          await page.goto('http://127.0.0.1:4173/', { waitUntil: 'networkidle' });
+
+          await page.screenshot({ path: 'docs/screenshots/01-landing.png' });
+
+          await page.locator('#setupForm button[type="submit"]').click();
+          await page.locator('#gameView').waitFor({ state: 'visible' });
+          await page.locator('#advanceBtn').click();
+          await page.locator('#phaseText').waitFor();
+          await page.screenshot({ path: 'docs/screenshots/02-predation-dashboard.png' });
+
+          await page.locator('#rulesBtn').click();
+          await page.locator('#rulesDialog').waitFor({ state: 'visible' });
+          await page.screenshot({ path: 'docs/screenshots/03-rules-and-skills.png' });
+
+          await browser.close();
+          NODE
+
+      - name: Commit screenshots to repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/screenshots/*.png
+          if git diff --cached --quiet; then
+            echo "Screenshots unchanged"
+          else
+            git commit -m "Add real game portfolio screenshots"
+            git push
+          fi
