@@ -18,6 +18,7 @@
 body { margin: 0; color: var(--ink); background: radial-gradient(circle at 15% 0%, #fff7dd 0, transparent 28%), linear-gradient(180deg, #f4efe5, #ece7dc); min-height: 100vh; }
 button, input, select { font: inherit; }
 button { cursor: pointer; }
+a { color: inherit; }
 .site-header { max-width: 1480px; margin: 0 auto; padding: 34px 28px 20px; display:flex; justify-content:space-between; gap:24px; align-items:flex-start; }
 h1 { margin: 4px 0 6px; font-size: clamp(2rem, 4vw, 3.8rem); letter-spacing: -.045em; line-height: .98; }
 h2, h3 { margin: 0; }
@@ -42,6 +43,7 @@ h2, h3 { margin: 0; }
 .danger { color:var(--danger); }
 .jumbo { width:100%; padding:16px; font-size:1.05rem; }
 .header-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.link-button { text-decoration:none; display:inline-flex; align-items:center; justify-content:center; }
 .hidden { display:none !important; }
 .small-note, .muted { color:var(--muted); }
 .small-note { font-size:.84rem; margin:12px 0 0; }
@@ -78,7 +80,7 @@ h2, h3 { margin: 0; }
 .field-grid.three { grid-template-columns:repeat(3,1fr); }
 .field { display:flex; flex-direction:column; gap:5px; }
 .field label { font-size:.75rem; font-weight:800; color:var(--muted); }
-.field input, .field select { width:100%; border:1px solid var(--line); background:#fffdf9; border-radius:11px; padding:10px; }
+.field input, .field select, .tool-card select { width:100%; border:1px solid var(--line); background:#fffdf9; border-radius:11px; padding:10px; }
 .tool-card .primary { margin-top:12px; }
 .skill-market { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
 .skill-card { border:1px solid var(--line); border-radius:16px; padding:14px; background:#fff; }
@@ -109,11 +111,65 @@ h2, h3 { margin: 0; }
 .order-strip span { padding:6px 9px; background:#f2ede3; border-radius:9px; font-weight:800; font-size:.78rem; }
 .check-row { display:flex; align-items:center; gap:8px; margin-top:10px; font-size:.86rem; }
 .result-card { background:#f4efe5; border-radius:16px; padding:14px; margin:10px 0; }
+
+/* Mode selection */
+.mode-header h1 { font-size:clamp(2.8rem,6vw,5.8rem); }
+.mode-intro { padding:26px 30px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:18px; }
+.mode-intro h2 { margin:10px 0 5px; font-size:2rem; }
+.mode-intro p { margin:0; color:var(--muted); max-width:720px; }
+.mode-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+.mode-card { background:rgba(255,253,248,.96); border:1px solid rgba(89,75,52,.14); border-radius:26px; padding:28px; box-shadow:var(--shadow); display:flex; flex-direction:column; min-height:440px; }
+.mode-card.featured-mode { border:2px solid rgba(23,75,54,.5); transform:translateY(-4px); }
+.mode-card.online-mode { border-top:5px solid var(--teal); }
+.mode-icon { font-size:3rem; margin-bottom:14px; }
+.mode-card h2 { margin:8px 0 10px; font-size:2rem; }
+.mode-card p { color:var(--muted); line-height:1.55; }
+.mode-card ul { padding-left:20px; color:#46564e; line-height:1.8; margin-bottom:22px; }
+.mode-button { margin-top:auto; text-decoration:none; display:flex; justify-content:center; align-items:center; min-height:48px; }
+.mode-footer-card { padding:22px 28px; margin-top:18px; }
+.mode-cycle { display:flex; justify-content:space-between; gap:18px; align-items:center; margin-top:7px; }
+.mode-cycle strong { font-size:1.6rem; color:var(--green); }
+.mode-cycle span { color:var(--muted); }
+
+/* Solo mode */
+.solo-hero { max-width:960px; margin:0 auto; }
+.solo-start-form { display:grid; grid-template-columns:minmax(240px,1fr) 1fr; gap:12px; align-items:stretch; }
+.solo-name input { height:100%; }
+.solo-layout { display:grid; grid-template-columns:minmax(0,1fr) 360px; gap:18px; }
+.solo-layout .panel { padding:22px; }
+.solo-pill { background:#e8f3f7; color:#246174; }
+.your-survivor-panel { border:2px solid rgba(23,75,54,.32); }
+.solo-you-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.solo-you-stats > div { background:#f5f0e6; padding:12px; border-radius:14px; display:flex; flex-direction:column; gap:4px; }
+.solo-you-stats strong { font-size:1.35rem; }
+.solo-skills { margin-top:14px; }
+.skill-badge { display:inline-flex; align-items:center; gap:5px; background:#edf4ee; border:1px solid #d6e4d8; border-radius:999px; padding:7px 10px; font-size:.78rem; font-weight:800; }
+.human-card { border-color:rgba(23,75,54,.45); box-shadow:inset 0 0 0 1px rgba(23,75,54,.08); }
+.discussion-log { height:390px; overflow:auto; display:flex; flex-direction:column; gap:8px; padding-right:4px; }
+.chat-line { border-radius:14px; padding:10px 12px; background:#f3eee4; display:flex; flex-direction:column; gap:3px; font-size:.85rem; line-height:1.4; }
+.chat-line.bot strong { color:var(--teal); }
+.chat-line.human { background:#e8f1ea; }
+.chat-line.human strong { color:var(--green); }
+.discussion-compose { display:grid; grid-template-columns:1fr auto; gap:8px; margin-top:12px; }
+.discussion-compose input { min-width:0; border:1px solid var(--line); border-radius:12px; padding:11px; }
+.button-row { display:flex; gap:8px; margin-top:12px; }
+.button-row > * { flex:1; }
+.phase-cta { background:linear-gradient(135deg,#f4f0df,#edf4ee); }
+.solo-market { margin-bottom:14px; }
+.solo-auto-auction { margin-top:14px; }
+.standings-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+.winner-card { border:2px solid var(--gold); background:#fff9e9; }
+
 @media (max-width: 1150px) {
   .player-grid { grid-template-columns:repeat(3,1fr); }
-  .layout { grid-template-columns:1fr; }
+  .layout, .solo-layout { grid-template-columns:1fr; }
   .side-column { display:grid; grid-template-columns:1fr 1fr; }
+  .solo-side { display:grid; grid-template-columns:1fr 1fr; }
+  .discussion-panel { grid-column:1/-1; }
   .event-log { max-height:300px; }
+  .mode-grid { grid-template-columns:1fr; }
+  .mode-card { min-height:0; }
+  .mode-card.featured-mode { transform:none; }
 }
 @media (max-width: 760px) {
   .site-header { padding:24px 16px 14px; flex-direction:column; }
@@ -124,6 +180,12 @@ h2, h3 { margin: 0; }
   .status-actions { grid-column:1/-1; }
   .status-actions button { width:100%; }
   .player-grid { grid-template-columns:repeat(2,1fr); }
-  .control-grid, .field-grid, .field-grid.three, .skill-market, .rules-grid, .skills-rules, .side-column { grid-template-columns:1fr; }
+  .control-grid, .field-grid, .field-grid.three, .skill-market, .rules-grid, .skills-rules, .side-column, .solo-side, .standings-grid { grid-template-columns:1fr; }
   .section-heading { align-items:flex-start; flex-direction:column; }
+  .mode-intro { align-items:flex-start; flex-direction:column; padding:20px; }
+  .mode-card { padding:22px; }
+  .mode-cycle { align-items:flex-start; flex-direction:column; }
+  .solo-start-form { grid-template-columns:1fr; }
+  .solo-you-stats { grid-template-columns:repeat(3,1fr); }
+  .discussion-log { height:300px; }
 }
