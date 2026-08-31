@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f3425" />
+  <meta name="description" content="Wild Australia: Evolution Clash — online multiplayer room and discussion mode." />
+  <title>Online Multiplayer · Wild Australia: Evolution Clash</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="supabase-config.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div><p class="eyebrow">ONLINE MULTIPLAYER · REAL-TIME ROOMS</p><h1>Wild Australia: Evolution Clash</h1><p class="subtitle">Ten devices, one shared room, private identities and a live discussion channel.</p></div>
+    <div class="header-actions"><a class="ghost link-button" href="index.html">Modes</a></div>
+  </header>
+  <main class="shell">
+    <section id="backendBanner" class="panel backend-banner"><div><p class="eyebrow">BACKEND STATUS</p><h2 id="backendTitle">Checking real-time service…</h2><p id="backendMessage" class="muted">Online mode needs the connected Supabase project.</p></div><span id="backendChip" class="status-chip">CHECKING</span></section>
+
+    <section id="onlineLobby" class="online-lobby-grid">
+      <section class="panel online-card"><p class="eyebrow">CREATE ROOM</p><h2>Host a game</h2><p class="muted">Create a six-character room code, then invite nine other players.</p><div class="field"><label>Your name</label><input id="hostName" maxlength="24" value="Host"></div><button id="createRoomBtn" class="primary jumbo">Create Online Room</button></section>
+      <section class="panel online-card"><p class="eyebrow">JOIN ROOM</p><h2>Enter a code</h2><p class="muted">Use the code shared by the host. Each device receives its own private player session.</p><div class="field"><label>Your name</label><input id="joinName" maxlength="24" value="Player"></div><div class="field"><label>Room code</label><input id="roomCodeInput" maxlength="6" placeholder="ABC123"></div><button id="joinRoomBtn" class="primary jumbo">Join Room</button></section>
+    </section>
+
+    <section id="roomView" class="hidden">
+      <section class="status-board panel"><div><span class="label">Room</span><strong id="roomCodeText">------</strong></div><div><span class="label">Players</span><strong id="roomPlayerCount">0 / 10</strong></div><div><span class="label">Status</span><strong id="roomStatusText">Lobby</strong></div><div><span class="label">You</span><strong id="roomYouText">Player</strong></div><div class="status-actions"><button id="leaveRoomBtn" class="ghost danger">Leave</button></div></section>
+      <section class="solo-layout">
+        <div class="main-column">
+          <section class="panel"><div class="section-heading"><div><p class="eyebrow">ROOM PLAYERS</p><h2>Seats</h2></div><p class="muted">The game starts when all 10 seats are occupied.</p></div><div id="onlinePlayers" class="player-grid"></div></section>
+          <section class="panel"><div class="section-heading"><div><p class="eyebrow">GAME</p><h2>Shared game state</h2></div><span class="pill">ONLINE</span></div><div id="onlineGamePanel" class="tool-card"><h3>Waiting in lobby</h3><p class="muted">The host will start after 10 players join. Private identities will then be delivered only to the matching player device.</p><button id="startOnlineBtn" class="primary" disabled>Start 10-player game</button></div></section>
+        </div>
+        <aside class="side-column"><section class="panel discussion-panel"><div class="section-heading compact"><div><p class="eyebrow">DISCUSSION</p><h3>Room chat</h3></div></div><div id="onlineChat" class="discussion-log"></div><form id="onlineChatForm" class="discussion-compose"><input id="onlineChatInput" maxlength="220" placeholder="Discuss, bluff, negotiate…"><button class="primary" type="submit">Send</button></form></section></aside>
+      </section>
+    </section>
+  </main>
+  <script type="module" src="online.js"></script>
+</body>
+</html>
