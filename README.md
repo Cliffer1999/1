@@ -2,20 +2,38 @@
 
 A browser-based, 10-player pass-and-play social strategy game adapted for an Australian audience.
 
+🎮 **[Play the live game](https://cliffer1999.github.io/1/)**
+
+## Screenshots
+
+### Predation dashboard
+![Wild Australia predation dashboard](docs/screenshots/02-predation-dashboard.png)
+
+<details>
+<summary>More screenshots</summary>
+
+### Game setup
+![Wild Australia game setup](docs/screenshots/01-landing.png)
+
+### Rules & Australian skill deck
+![Wild Australia rules and skills](docs/screenshots/03-rules-and-skills.png)
+
+</details>
+
 The project takes the supplied **Forest Evolution / Forest Battle** ruleset as its mechanical base and localises the presentation around three Australian habitats: **Outback**, **Great Barrier Reef** and **Bushland**. Core mechanics such as secret identities, life points, numbered predation cards, cyclic match-ups, four rounds, Free / Predation / Evolution phases and the supplied skill effects are retained.
 
 > This repository is an independent game prototype. It is not affiliated with the original television programme, production company or rights holders. The Australian names, interface and artwork treatment in this repository are original to this adaptation.
 
 ## Play
 
-No build step is required.
+The fastest way to try it is the **live GitHub Pages build** above. No account or installation is required.
+
+For local play:
 
 1. Download or clone the repository.
 2. Serve the folder with any static web server.
 3. Enter exactly 10 player names.
 4. Pass the device around for private identity checks, then use the public game dashboard as the referee / game state tracker.
-
-For local serving:
 
 ```bash
 python3 -m http.server 8080
@@ -126,6 +144,8 @@ GitHub Actions runs both the engine tests and Chromium browser gameplay tests on
 - Node `node:test` unit tests
 - Playwright Chromium end-to-end tests
 - GitHub Actions CI
+- GitHub Pages automated deployment
+- Automated real-browser portfolio screenshot generation
 
 ## Portfolio angle
 
