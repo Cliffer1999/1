@@ -61,3 +61,13 @@ test('solo mode starts, supports discussion and reaches final standings through 
   await expect(page.locator('.standings-grid .tool-card')).toHaveCount(10);
   expect(pageErrors).toEqual([]);
 });
+
+test('online page loads safely when realtime credentials are not configured', async ({ page }) => {
+  const pageErrors=[];
+  page.on('pageerror',error=>pageErrors.push(error.message));
+  await page.goto('/online.html');
+  await expect(page.locator('#backendTitle')).toHaveText('Realtime backend not connected yet');
+  await expect(page.locator('#createRoomBtn')).toBeDisabled();
+  await expect(page.locator('#joinRoomBtn')).toBeDisabled();
+  expect(pageErrors).toEqual([]);
+});
