@@ -4,7 +4,7 @@ test('a 10-player game can start, reveal a role, resolve predation and reach evo
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
-  await page.goto('/');
+  await page.goto('/local.html');
   await expect(page).toHaveTitle(/Wild Australia: Evolution Clash/);
   await expect(page.locator('#setupView')).toBeVisible();
 
@@ -42,7 +42,7 @@ test('a player who still passes and was not targeted pays the stage value', asyn
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
-  await page.goto('/');
+  await page.goto('/local.html');
   await page.locator('#setupForm button[type="submit"]').click();
   await page.locator('#advanceBtn').click();
   await expect(page.locator('#phaseText')).toContainText('Predation');
@@ -63,10 +63,9 @@ test('the browser state machine can complete all four rounds and show final stan
   const pageErrors = [];
   page.on('pageerror', error => pageErrors.push(error.message));
 
-  await page.goto('/');
+  await page.goto('/local.html');
   await page.locator('#setupForm button[type="submit"]').click();
 
-  // Round 1: Free -> Predation -> Evolution -> Round 2.
   await page.locator('#advanceBtn').click();
   await expect(page.locator('#phaseText')).toContainText('Predation');
   await page.locator('#advanceBtn').click();
@@ -75,14 +74,12 @@ test('the browser state machine can complete all four rounds and show final stan
   await expect(page.locator('#roundText')).toHaveText('2 / 4');
   await expect(page.locator('#phaseText')).toHaveText('Free');
 
-  // Round 2: Free -> Predation -> Evolution -> Round 3.
   await page.locator('#advanceBtn').click();
   await page.locator('#advanceBtn').click();
   await expect(page.locator('#phaseText')).toHaveText('Evolution');
   await page.locator('#advanceBtn').click();
   await expect(page.locator('#roundText')).toHaveText('3 / 4');
 
-  // Round 3 has two predation stages.
   await page.locator('#advanceBtn').click();
   await expect(page.locator('#phaseText')).toHaveText('Predation 1/2');
   await page.locator('#advanceBtn').click();
@@ -92,7 +89,6 @@ test('the browser state machine can complete all four rounds and show final stan
   await page.locator('#advanceBtn').click();
   await expect(page.locator('#roundText')).toHaveText('4 / 4');
 
-  // Round 4 also has two predation stages, then the game finishes.
   await page.locator('#advanceBtn').click();
   await expect(page.locator('#phaseText')).toHaveText('Predation 1/2');
   await page.locator('#advanceBtn').click();
@@ -108,7 +104,7 @@ test('the browser state machine can complete all four rounds and show final stan
 });
 
 test('rules modal exposes the complete 17-skill Australian deck', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/local.html');
   await page.locator('#rulesBtn').click();
   await expect(page.locator('#rulesDialog')).toBeVisible();
   await expect(page.locator('.skill-rule')).toHaveCount(17);
