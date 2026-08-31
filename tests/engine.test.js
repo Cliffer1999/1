@@ -1,0 +1,43 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  compareRoles,newGame,setPhase,resolvePredation,awardSkill,applyHabitatCollapse,
+  setParasiteHost,eliminatePlayer,predationValue,transferPredationCard,transferLife,
+  startNextRound,useHawkEye,resolvePackFollowUps
+} from '../engine.js';
+
+function game(){
+  const g=newGame(Array.from({length:10},(_,i)=>`P${i+1}`),()=>0.999999);
+  const roles=['outback-K','outback-Q','outback-J','reef-K','reef-Q','reef-J','bush-K','bush-Q','bush-J','joker'];
+  g.players.forEach((p,i)=>p.roleId=roles[i]);return g;
+}
+
+test('rank cycle K > Q > J > K',()=>{assert.equal(compareRoles({roleId:'outback-K'},{roleId:'reef-Q'}),1);assert.equal(compareRoles({roleId:'outback-Q'},{roleId:'reef-J'}),1);assert.equal(compareRoles({roleId:'outback-J'},{roleId:'reef-K'}),1);});
+test('faction cycle applies on same rank',()=>{assert.equal(compareRoles({roleId:'outback-K'},{roleId:'reef-K'}),1);assert.equal(compareRoles({roleId:'reef-K'},{roleId:'bush-K'}),1);assert.equal(compareRoles({roleId:'bush-K'},{roleId:'outback-K'}),1);});
+test('joker wins as predator and loses as prey',()=>{assert.equal(compareRoles({roleId:'joker'},{roleId:'outback-K'}),1);assert.equal(compareRoles({roleId:'outback-K'},{roleId:'joker'}),1);});
+test('amphibious overrides same-rank faction cycle',()=>{assert.equal(compareRoles({roleId:'reef-K'},{roleId:'outback-K'},['amphibious'],[]),1);assert.equal(compareRoles({roleId:'outback-K'},{roleId:'reef-K'},[],['amphibious']),-1);});
+test('round predation values match 2,3,4/5,6/7',()=>{const g=game();assert.equal(predationValue(g),2);g.round=2;assert.equal(predationValue(g),3);g.round=3;g.predationStage=0;assert.equal(predationValue(g),4);g.predationStage=1;assert.equal(predationValue(g),5);g.round=4;g.predationStage=0;assert.equal(predationValue(g),6);g.predationStage=1;assert.equal(predationValue(g),7);});
+test('normal predation consumes target card and transfers life',()=>{const g=game();setPhase(g,'predation',0);const r=resolvePredation(g,{attackerId:1,defenderId:5});assert.equal(r.winnerId,1);assert.equal(g.players[0].life,22);assert.equal(g.players[4].life,18);assert.ok(!g.players[0].predationCards.includes(5));});
+test('blood rush adds two extra life swing',()=>{const g=game();g.players[0].skills.push('bloodRush');setPhase(g,'predation',0);const r=resolvePredation(g,{attackerId:1,defenderId:5});assert.equal(r.amount,4);assert.equal(g.players[0].life,24);assert.equal(g.players[4].life,16);});
+test('apex bloodline does not consume predation card',()=>{const g=game();g.players[0].skills.push('apexBloodline');setPhase(g,'predation',0);resolvePredation(g,{attackerId:1,defenderId:5});assert.ok(g.players[0].predationCards.includes(5));});
+test('evasive leap redirects to next living seat',()=>{const g=game();g.players[4].skills.push('evasiveLeap');setPhase(g,'predation',0);const r=resolvePredation(g,{attackerId:1,defenderId:5,useEvasiveLeap:true});assert.equal(r.redirectedDefenderId,6);assert.ok(!g.players[0].predationCards.includes(6));});
+test('decoy intercepts',()=>{const g=game();g.players[6].skills.push('decoy');setPhase(g,'predation',0);const r=resolvePredation(g,{attackerId:1,defenderId:5,decoyId:7});assert.equal(r.redirectedDefenderId,7);assert.ok(g.players[6].stageUses.decoy);});
+test('three headed dingo can attack three times',()=>{const g=game();g.players[0].skills.push('threeHeadedDingo');setPhase(g,'predation',0);resolvePredation(g,{attackerId:1,defenderId:5});resolvePredation(g,{attackerId:1,defenderId:6});resolvePredation(g,{attackerId:1,defenderId:8});assert.throws(()=>resolvePredation(g,{attackerId:1,defenderId:9}),/only initiate 3/);});
+test('echidna spines charges attacker first',()=>{const g=game();g.players[4].skills.push('echidnaSpines');setPhase(g,'predation',0);resolvePredation(g,{attackerId:1,defenderId:5});assert.equal(g.players[0].life,21);});
+test('tail drop discards two cards instead of prey life',()=>{const g=game();g.players[4].skills.push('tailDrop');setPhase(g,'predation',0);const before=g.players[4].life;const r=resolvePredation(g,{attackerId:1,defenderId:5,tailDropCards:[1,2]});assert.equal(r.tailDropUsed,true);assert.equal(g.players[4].life,before);assert.ok(!g.players[4].predationCards.includes(1));assert.ok(!g.players[4].predationCards.includes(2));assert.equal(g.players[0].life,22);});
+test('torpor blocks targeting but not further allowed attacks',()=>{const g=game();g.players[0].skills.push('torpor');setPhase(g,'predation',0);resolvePredation(g,{attackerId:1,defenderId:5});assert.equal(g.players[0].torpor,true);assert.throws(()=>resolvePredation(g,{attackerId:2,defenderId:1}),/torpor/);g.players[0].skills.push('threeHeadedDingo');assert.doesNotThrow(()=>resolvePredation(g,{attackerId:1,defenderId:6}));});
+test('parasite copies host predation gains',()=>{const g=game();g.players[9].skills.push('parasite');setParasiteHost(g,10,1);setPhase(g,'predation',0);resolvePredation(g,{attackerId:1,defenderId:5});assert.equal(g.players[9].life,22);});
+test('genetic adaptation reduces auction cost by 3 minimum 1',()=>{const g=game();g.players[0].skills.push('geneticAdaptation');setPhase(g,'evolution');const cost=awardSkill(g,'hawkEye',1,2);assert.equal(cost,1);assert.equal(g.players[0].life,19);});
+test('habitat collapse damages a faction once',()=>{const g=game();g.players[9].skills.push('habitatCollapse');const affected=applyHabitatCollapse(g,10,'outback');assert.deepEqual(affected,[1,2,3]);assert.equal(g.players[0].life,15);assert.throws(()=>applyHabitatCollapse(g,10,'reef'),/already been used/);});
+test('taipan venom eliminates killer too',()=>{const g=game();g.players[4].skills.push('taipanVenom');g.players[4].life=1;setPhase(g,'predation',0);resolvePredation(g,{attackerId:1,defenderId:5});assert.equal(g.players[4].alive,false);assert.equal(g.players[0].alive,false);});
+test('scavenger gains 5 on elimination',()=>{const g=game();g.players[9].skills.push('scavenger');eliminatePlayer(g,2,1,'test');assert.equal(g.players[9].life,25);});
+test('predation cards trade only in free phase',()=>{const g=game();transferPredationCard(g,1,2,10);assert.ok(!g.players[0].predationCards.includes(10));assert.ok(g.players[1].predationCards.includes(10));setPhase(g,'predation',0);assert.throws(()=>transferPredationCard(g,1,2,9),/free phase/);});
+test('hawk eye reveals target once and logs public use',()=>{const g=game();g.players[0].skills.push('hawkEye');const role=useHawkEye(g,1,2);assert.equal(role.id,'outback-Q');assert.match(g.log[0],/used Wedge-tail Vision/);assert.throws(()=>useHawkEye(g,1,3),/already been used/);});
+test('next round loads correct skill pool',()=>{const g=game();startNextRound(g);assert.equal(g.round,2);assert.ok(g.availableSkills.includes('amphibious'));assert.ok(!g.availableSkills.includes('hawkEye'));});
+test('pack follow-ups use no cards and share life with leader',()=>{const g=game();g.players[0].skills.push('dingoPackLeader');g.players[0].packmates=[2,3];g.round=3;setPhase(g,'predation',0);const before=g.players[1].predationCards.length;const results=resolvePackFollowUps(g,1,5);assert.equal(results.length,2);assert.equal(g.players[1].predationCards.length,before);assert.ok(g.players[0].life>=23);});
+test('round 1 and 2 losers enter Nature Reserve',()=>{const g=game();setPhase(g,'predation',0);resolvePredation(g,{attackerId:1,defenderId:5});assert.equal(g.players[4].protected,true);assert.throws(()=>resolvePredation(g,{attackerId:2,defenderId:5}),/Nature Reserve/);});
+test('round 3 has no Nature Reserve protection',()=>{const g=game();g.round=3;setPhase(g,'predation',0);resolvePredation(g,{attackerId:1,defenderId:5});assert.equal(g.players[4].protected,false);});
+test('eliminating predator gains 3 life and remaining cards',()=>{const g=game();g.players[4].life=1;setPhase(g,'predation',0);const before=g.players[0].predationCards.length;resolvePredation(g,{attackerId:1,defenderId:5});assert.equal(g.players[4].alive,false);assert.equal(g.players[0].life,25);assert.ok(g.players[0].predationCards.length>before);});
+test('free-phase received life is capped at 10',()=>{const g=game();transferLife(g,1,2,6);transferLife(g,3,2,4);assert.equal(g.players[1].tradedLifeReceived,10);assert.throws(()=>transferLife(g,4,2,1),/at most 10/);});
+test('life cannot be traded to self',()=>{const g=game();assert.throws(()=>transferLife(g,1,1,1),/different players/);});
+test('predation card cannot be traded to self',()=>{const g=game();assert.throws(()=>transferPredationCard(g,1,1,1),/different players/);});
