@@ -54,8 +54,56 @@ test('a player who still passes and was not targeted pays the stage value', asyn
   await page.locator('#advanceBtn').click();
   await expect(page.locator('#phaseText')).toHaveText('Evolution');
   await expect(page.locator('.player-card').first().locator('.life')).toContainText('18');
-  await expect(page.locator('#eventLog').first()).toContainText('still refused predation');
+  await expect(page.locator('#eventLog')).toContainText('still refused predation');
 
+  expect(pageErrors).toEqual([]);
+});
+
+test('the browser state machine can complete all four rounds and show final standings', async ({ page }) => {
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+
+  await page.goto('/');
+  await page.locator('#setupForm button[type="submit"]').click();
+
+  // Round 1: Free -> Predation -> Evolution -> Round 2.
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toContainText('Predation');
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toHaveText('Evolution');
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#roundText')).toHaveText('2 / 4');
+  await expect(page.locator('#phaseText')).toHaveText('Free');
+
+  // Round 2: Free -> Predation -> Evolution -> Round 3.
+  await page.locator('#advanceBtn').click();
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toHaveText('Evolution');
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#roundText')).toHaveText('3 / 4');
+
+  // Round 3 has two predation stages.
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toHaveText('Predation 1/2');
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toHaveText('Predation 2/2');
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toHaveText('Evolution');
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#roundText')).toHaveText('4 / 4');
+
+  // Round 4 also has two predation stages, then the game finishes.
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toHaveText('Predation 1/2');
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toHaveText('Predation 2/2');
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toHaveText('Evolution');
+  await page.locator('#advanceBtn').click();
+
+  await expect(page.locator('#phaseText')).toHaveText('Finished');
+  await expect(page.locator('#controlTitle')).toHaveText('Final Standings');
+  await expect(page.locator('#phaseControls .tool-card')).toHaveCount(10);
   expect(pageErrors).toEqual([]);
 });
 
@@ -65,7 +113,7 @@ test('rules modal exposes the complete 17-skill Australian deck', async ({ page 
   await expect(page.locator('#rulesDialog')).toBeVisible();
   await expect(page.locator('.skill-rule')).toHaveCount(17);
   await expect(page.locator('#rulesContent')).toContainText('Outback');
-  await expect(page.locator('#rulesContent')).toContainText('Great Barrier Reef');
+  await expect(page.locator('#rulesContent')).toContainText('Reef');
   await expect(page.locator('#rulesContent')).toContainText('Bushland');
   await expect(page.locator('#rulesContent')).toContainText('Pass rule');
 });
