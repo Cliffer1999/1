@@ -38,6 +38,27 @@ test('a 10-player game can start, reveal a role, resolve predation and reach evo
   expect(pageErrors).toEqual([]);
 });
 
+test('a player who still passes and was not targeted pays the stage value', async ({ page }) => {
+  const pageErrors = [];
+  page.on('pageerror', error => pageErrors.push(error.message));
+
+  await page.goto('/');
+  await page.locator('#setupForm button[type="submit"]').click();
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toContainText('Predation');
+
+  await page.locator('#passPlayer').selectOption('1');
+  await page.locator('#passBtn').click();
+  await expect(page.locator('.player-card').first().locator('.status-row')).toContainText('PASS PENDING');
+
+  await page.locator('#advanceBtn').click();
+  await expect(page.locator('#phaseText')).toHaveText('Evolution');
+  await expect(page.locator('.player-card').first().locator('.life')).toContainText('18');
+  await expect(page.locator('#eventLog').first()).toContainText('still refused predation');
+
+  expect(pageErrors).toEqual([]);
+});
+
 test('rules modal exposes the complete 17-skill Australian deck', async ({ page }) => {
   await page.goto('/');
   await page.locator('#rulesBtn').click();
@@ -46,4 +67,5 @@ test('rules modal exposes the complete 17-skill Australian deck', async ({ page 
   await expect(page.locator('#rulesContent')).toContainText('Outback');
   await expect(page.locator('#rulesContent')).toContainText('Great Barrier Reef');
   await expect(page.locator('#rulesContent')).toContainText('Bushland');
+  await expect(page.locator('#rulesContent')).toContainText('Pass rule');
 });
