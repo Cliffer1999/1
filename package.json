@@ -1,12 +1,12 @@
 {
   "name": "wild-australia-evolution-clash",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "scripts": {
     "test": "node --test tests/*.test.js",
     "test:e2e": "playwright test",
-    "check": "node --check engine.js && node --check app.js && node --check app-v2.js && npm test"
+    "check": "node --check engine.js && node --check app.js && node --check app-v2.js && node --check solo-ai.js && node --check solo.js && npm test"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0"
