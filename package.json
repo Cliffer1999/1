@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "test:e2e": "playwright test",
-    "check": "node --check engine.js && node --check app.js && npm test"
+    "check": "node --check engine.js && node --check app.js && node --check app-v2.js && npm test"
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0"
