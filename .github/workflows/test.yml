@@ -1,4 +1,4 @@
-name: Test game engine
+name: Test game engine and browser
 
 on:
   push:
@@ -17,5 +17,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - name: Install test tooling
+        run: npm install --no-audit --no-fund
       - name: Syntax and engine tests
         run: npm run check
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Browser gameplay tests
+        run: npm run test:e2e
